@@ -8,7 +8,7 @@
 Game::Game()
     : score(0),
       rng(std::chrono::system_clock::now().time_since_epoch().count()) {
-  std::uniform_int_distribution<int> dist(5, 15);
+  std::uniform_int_distribution<int> dist(MIN_CLIENTS, MAX_CLIENTS);
   int n = dist(rng);
   generateRandomClients(n);
 }
@@ -35,8 +35,8 @@ std::vector<std::string> Game::generateItemOptions(const Client& client) {
   std::uniform_int_distribution<int> distCorrect(0, correct.size() - 1);
   std::string chosenCorrect = correct[distCorrect(rng)];
 
-  std::vector<std::string> wrong =
-      items.getWrongItems(client.getRace(), client.getRole(), 2);
+  std::vector<std::string> wrong = items.getWrongItems(
+      client.getRace(), client.getRole(), WRONG_ITEMS_COUNT);
 
   std::vector<std::string> options = {chosenCorrect, wrong[0], wrong[1]};
 
@@ -65,14 +65,14 @@ void Game::play() {
     std::vector<std::string> correct =
         items.getCorrectItems(client->getRace(), client->getRole());
 
-    if (choice >= 1 && choice <= 3 &&
+    if (choice >= 1 && choice <= OPTIONS_COUNT &&
         std::find(correct.begin(), correct.end(), options[choice - 1]) !=
             correct.end()) {
-      std::cout << "Правильно! +10 очков.\n";
-      score += 10;
+      std::cout << "Правильно! +" << CORRECT_SCORE << " очков.\n";
+      score += CORRECT_SCORE;
     } else {
-      std::cout << "Неправильно! -5 очков.\n";
-      score -= 5;
+      std::cout << "Неправильно! -" << WRONG_SCORE << " очков.\n";
+      score -= WRONG_SCORE;
     }
 
     displayScore();
